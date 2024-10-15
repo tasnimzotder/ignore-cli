@@ -12,7 +12,6 @@ var addCmd = &cobra.Command{
 	Short: "Add a .gitignore template to the project",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		cmd.Println("Adding .gitignore template:", args[0])
 		return gitignore.Add(args[0], overrideFlag)
 	},
 }

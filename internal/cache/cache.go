@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"github.com/tasnimzotder/ignore-cli/internal/utils"
@@ -24,13 +25,34 @@ type Template struct {
 	LastUpdate    time.Time `json:"last_update"`
 }
 
-func Get() (*Cache, error) {
-	// homeDir, err := os.UserHomeDir()
-	// homeDir, err := os.Getwd()
-	// if err != nil {
-	// 	return nil, err
-	// }
+var (
+	instance *Cache
+	once     sync.Once
+)
 
+func GetInstance() *Cache {
+	once.Do(func() {
+		instance = &Cache{}
+		instance.load()
+	})
+
+	return instance
+}
+
+func (c *Cache) load() error {
+	cacheFilePath := utils.GetCacheFilePath()
+	data, err := os.ReadFile(cacheFilePath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+
+	return json.Unmarshal(data, c)
+}
+
+func Get() (*Cache, error) {
 	cacheFilePath := utils.GetCacheFilePath()
 	data, err := os.ReadFile(cacheFilePath)
 	if err != nil {
@@ -46,12 +68,6 @@ func Get() (*Cache, error) {
 }
 
 func (c *Cache) Save() error {
-	// homeDir, err := os.UserHomeDir()
-	// homeDir, err := os.Getwd()
-	// if err != nil {
-	// 	return err
-	// }
-
 	cacheFilePath := utils.GetCacheFilePath()
 	data, err := json.Marshal(c)
 	if err != nil {
@@ -90,12 +106,6 @@ func (t *Template) Update() error {
 	if err != nil {
 		return err
 	}
-
-	// homeDir, err := os.UserHomeDir()
-	// homeDir, err := os.Getwd()
-	// if err != nil {
-	// 	return err
-	// }
 
 	// cacheDir := filepath.Join(homeDir, "templates")
 	cacheDir := utils.GetTemplateDir()

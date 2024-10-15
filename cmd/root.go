@@ -1,15 +1,27 @@
 package cmd
 
-import "github.com/spf13/cobra"
+import (
+	"fmt"
+	"os"
 
-var RootCmd = &cobra.Command{
+	"github.com/spf13/cobra"
+)
+
+var rootCmd = &cobra.Command{
 	Use:   "ignore",
 	Short: "A CLI tool to manage .gitignore files",
 	Long:  `ignore is a CLI tool to manage .gitignore files. It allows you to list, search, and add .gitignore templates to your project.`,
 }
 
+func Execute() {
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}
+
 func init() {
-	RootCmd.AddCommand(listCmd)
-	RootCmd.AddCommand(searchCmd)
-	RootCmd.AddCommand(addCmd)
+	rootCmd.AddCommand(addCmd)
+	rootCmd.AddCommand(listCmd)
+	rootCmd.AddCommand(searchCmd)
 }

@@ -16,10 +16,7 @@ const (
 )
 
 func Get(name string) (*cache.Template, error) {
-	c, err := cache.Get()
-	if err != nil {
-		return nil, err
-	}
+	c := cache.GetInstance()
 
 	for _, t := range c.Templates {
 		if strings.EqualFold(t.Name, name) {
@@ -27,16 +24,17 @@ func Get(name string) (*cache.Template, error) {
 				if err := t.Update(); err != nil {
 					return nil, err
 				}
+
 				c.UpdateTemplate(t)
 				if err := c.Save(); err != nil {
 					return nil, err
 				}
 			}
+
 			return &t, nil
 		}
 	}
 
-	// Template not found in cache, fetch it
 	t := cache.Template{
 		Name: name,
 		URL:  fmt.Sprintf(gitignoreAPIURL, name),
@@ -69,12 +67,9 @@ func Search(query string) ([]cache.Template, error) {
 }
 
 func List() ([]cache.Template, error) {
-	c, err := cache.Get()
-	if err != nil {
-		return nil, err
-	}
+	c := cache.GetInstance()
 
-	if len(c.Templates) == 0 || time.Since(c.LastUpdate) > 24*time.Hour {
+	if len(c.Templates) == 0 || time.Since(c.LastUpdate) > 24*7*time.Hour {
 		if err := updateTemplateList(c); err != nil {
 			return nil, err
 		}
