@@ -1,3 +1,11 @@
+<div align="center">
+
+![GitHub Release](https://img.shields.io/github/v/release/tasnimzotder/ignore-cli?style=flat-square)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/tasnimzotder/ignore-cli/build-test-release.yml?branch=main&style=flat-square)
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/tasnimzotder/ignore-cli/total?style=flat-square)
+
+</div>
+
 # Ignore CLI
 
 `Ignore CLI` is a simple command-line tool for managing `.gitignore` files in your Git repositories. It allows you to easily add, list, and search for `.gitignore` templates, streamlining your workflow and helping you maintain clean repositories.
