@@ -10,24 +10,6 @@
 
 `Ignore CLI` is a simple command-line tool for managing `.gitignore` files in your Git repositories. It allows you to easily add, list, and search for `.gitignore` templates, streamlining your workflow and helping you maintain clean repositories.
 
-## Table of Contents
-
-- [Ignore CLI](#ignore-cli)
-  - [Table of Contents](#table-of-contents)
-  - [Features](#features)
-  - [Workflow](#workflow)
-  - [Installation](#installation)
-  - [Using Brew (macOS)](#using-brew-macos)
-    - [From Binary](#from-binary)
-    - [From Source](#from-source)
-  - [Usage](#usage)
-    - [Commands](#commands)
-      - [Add](#add)
-      - [List](#list)
-      - [Search](#search)
-  - [Contributing](#contributing)
-  - [License](#license)
-
 ## Features
 
 - Add `.gitignore` templates to your project
@@ -36,40 +18,9 @@
 - Efficient caching of templates for improved performance
 - User-friendly command-line interface built with Cobra
 
-## Workflow
-
-```mermaid
-graph TD
-    A[Start] --> B{Command?}
-    B -->|Add| C[Add Command]
-    B -->|List| D[List Command]
-    B -->|Search| E[Search Command]
-
-    C --> F{Template in Cache?}
-    F -->|Yes| G[Retrieve from Cache]
-    F -->|No| H[Fetch from GitHub API]
-    G --> I[Update .gitignore file]
-    H --> J[Update Cache]
-    J --> I
-
-    D --> K[Retrieve Templates from Cache]
-    K --> L{Cache Expired?}
-    L -->|Yes| M[Update Cache from GitHub API]
-    L -->|No| N[Display Template List]
-    M --> N
-
-    E --> O[Search Query]
-    O --> P[Search in Cached Templates]
-    P --> Q[Display Search Results]
-
-    I --> R[End]
-    N --> R
-    Q --> R
-```
-
 ## Installation
 
-## Using Brew (macOS)
+### Using Brew (macOS)
 
 ```sh
 brew tap tasnimzotder/ignore-cli https://github.com/tasnimzotder/ignore-cli
@@ -138,16 +89,36 @@ ignore --help
 ignore [command] --help
 ```
 
-## Contributing
+## Workflow
 
-Contributions are welcome! Here are some ways you can contribute to this project:
+```mermaid
+graph TD
+    A[Start] --> B{Command?}
+    B -->|Add| C[Add Command]
+    B -->|List| D[List Command]
+    B -->|Search| E[Search Command]
 
-1. Report bugs and suggest features by opening issues
-2. Submit pull requests to fix issues or add new features
-3. Improve documentation
-4. Share your feedback and ideas
+    C --> F{Template in Cache?}
+    F -->|Yes| G[Retrieve from Cache]
+    F -->|No| H[Fetch from GitHub API]
+    G --> I[Update .gitignore file]
+    H --> J[Update Cache]
+    J --> I
 
-Before contributing, please read our [Contributing Guide](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+    D --> K[Retrieve Templates from Cache]
+    K --> L{Cache Expired?}
+    L -->|Yes| M[Update Cache from GitHub API]
+    L -->|No| N[Display Template List]
+    M --> N
+
+    E --> O[Search Query]
+    O --> P[Search in Cached Templates]
+    P --> Q[Display Search Results]
+
+    I --> R[End]
+    N --> R
+    Q --> R
+```
 
 ## License
 
