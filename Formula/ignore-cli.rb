@@ -1,4 +1,4 @@
-class IgnoreCLI < Formula
+class IgnoreCli < Formula
     desc "A simple command-line tool for managing .gitignore files in your Git repositories Topics"
     homepage "https://github.com/tasnimzotder/ignore-cli"
     url "https://github.com/tasnimzotder/ignore-cli/releases/download/v0.0.2/ignore-darwin-arm64-v0.0.2"
