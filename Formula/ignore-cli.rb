@@ -6,7 +6,7 @@ class IgnoreCli < Formula
     version "0.0.2"
 
     def install
-        bin.install "ignore"
+        bin.install "ignore-darwin-arm64-v0.0.2" => "ignore"
     end
 
     test do
