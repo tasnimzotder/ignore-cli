@@ -93,6 +93,9 @@ jobs:
 
       - name: Update Homebrew formula
         run: |
+          git checkout main
+          git pull origin main
+
           # get the sha256 checksum for the binary (macOS arm64)
           SHA256=$(grep ignore-darwin-arm64-${{ env.tag }} build/checksums.txt | cut -d' ' -f1)
 
