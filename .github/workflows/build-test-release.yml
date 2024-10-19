@@ -2,8 +2,6 @@ name: Build, Test, and Release
 
 on:
   push:
-    branches:
-      - main
     tags:
       - "v*.*.*"
   pull_request:
@@ -90,5 +88,25 @@ jobs:
           body: ${{ steps.changelog.outputs.changelog }}
           draft: false
           prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update Homebrew formula
+        run: |
+          # get the sha256 checksum for the binary (macOS arm64)
+          SHA256=$(grep ignore-darwin-arm64-${{ env.tag }} build/checksums.txt | cut -d' ' -f1)
+
+          # update the formula
+          sed -i 's|url ".*"|url "https://github.com/tasnimzotder/ignore-cli/releases/download/${{ env.tag }}/ignore-darwin-arm64-${{ env.tag }}"|' Formula/ignore-cli.rb
+          sed -i "s/sha256 \".*\"/sha256 \"$SHA256\"/" Formula/ignore-cli.rb
+          sed -i 's/version ".*"/version "${{ env.tag }}"/' Formula/ignore-cli.rb
+          sed -i 's/bin.install ".*" => "ignore"/bin.install "ignore-darwin-arm64-${{ env.tag }}" => "ignore"/' Formula/ignore-cli.rb
+
+          # commit config changes
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add Formula/ignore-cli.rb
+          git commit -m "update homebrew formula for ${{ env.tag }}"
+          git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
