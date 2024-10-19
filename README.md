@@ -17,6 +17,7 @@
   - [Features](#features)
   - [Workflow](#workflow)
   - [Installation](#installation)
+  - [Using Brew (macOS)](#using-brew-macos)
     - [From Binary](#from-binary)
     - [From Source](#from-source)
   - [Usage](#usage)
@@ -67,6 +68,13 @@ graph TD
 ```
 
 ## Installation
+
+## Using Brew (macOS)
+
+```sh
+brew tap tasnimzotder/ignore-cli https://github.com/tasnimzotder/ignore-cli
+brew install ignore-cli
+```
 
 ### From Binary
 
