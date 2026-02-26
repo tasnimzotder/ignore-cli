@@ -9,8 +9,8 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use:   "ignore",
-	Short: "A CLI tool to manage .gitignore files",
-	Long:  `ignore is a CLI tool to manage .gitignore files. It allows you to list, search, and add .gitignore templates to your project.`,
+	Short: "A TUI tool to manage .gitignore files",
+	Long:  `ignore is a CLI tool to manage .gitignore files using GitHub's gitignore templates. Features an interactive template picker with fuzzy search.`,
 }
 
 func Execute() {
@@ -18,10 +18,4 @@ func Execute() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-}
-
-func init() {
-	rootCmd.AddCommand(addCmd)
-	rootCmd.AddCommand(listCmd)
-	rootCmd.AddCommand(searchCmd)
 }

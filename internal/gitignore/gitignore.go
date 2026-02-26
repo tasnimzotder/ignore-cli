@@ -1,86 +1,59 @@
-// package gitignore
-
-// import (
-// 	"fmt"
-// 	"os"
-
-// 	"github.com/tasnimzotder/ignore-cli/internal/search"
-// 	"github.com/tasnimzotder/ignore-cli/internal/template"
-// )
-
-// func Add(projectType string, override bool) error {
-// 	// if cache is empty, fetch the list of templates
-// 	_, err := search.AllTemplates()
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	t, err := template.Get(projectType)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	content, err := t.Content()
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	return writeGitignore(content, override)
-// }
-
-// func writeGitignore(content string, override bool) error {
-// 	if !override {
-// 		existing, err := os.ReadFile(".gitignore")
-// 		if err == nil {
-// 			content = string(existing) + "\n" + content
-// 		}
-// 	}
-
-// 	err := os.WriteFile(".gitignore", []byte(content), 0644)
-// 	if err != nil {
-// 		return fmt.Errorf("failed to write .gitignore file: %w", err)
-// 	}
-
-// 	fmt.Println("Successfully added/updated .gitignore file.")
-// 	return nil
-// }
-
 package gitignore
 
 import (
 	"fmt"
 	"os"
-
-	"github.com/tasnimzotder/ignore-cli/internal/template"
+	"regexp"
+	"strings"
 )
 
-func Add(templateName string, override bool) error {
-	t, err := template.Get(templateName)
-	if err != nil {
-		return err
-	}
-
-	content, err := t.Content()
-	if err != nil {
-		return err
-	}
-
-	return writeGitignore(content, override)
+type Entry struct {
+	Name    string
+	Content string
 }
 
-func writeGitignore(content string, override bool) error {
-	if !override {
-		existing, err := os.ReadFile(".gitignore")
-		if err == nil {
-			content = string(existing) + "\n" + content
+func Add(path, templateName, content string, override bool) error {
+	return AddMultiple(path, []Entry{{Name: templateName, Content: content}}, override)
+}
+
+func AddMultiple(path string, entries []Entry, override bool) error {
+	var sections []string
+	for _, e := range entries {
+		sections = append(sections, wrapWithMarkers(e.Name, e.Content))
+	}
+	newContent := strings.Join(sections, "\n\n")
+
+	if override {
+		return os.WriteFile(path, []byte(newContent+"\n"), 0644)
+	}
+
+	existing, err := os.ReadFile(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return os.WriteFile(path, []byte(newContent+"\n"), 0644)
+		}
+		return fmt.Errorf("failed to read %s: %w", path, err)
+	}
+
+	result := string(existing)
+	for _, e := range entries {
+		wrapped := wrapWithMarkers(e.Name, e.Content)
+		pattern := regexp.MustCompile(
+			fmt.Sprintf(`(?s)# >>> ignore-cli: %s\n.*?# <<< ignore-cli: %s\n?`,
+				regexp.QuoteMeta(e.Name), regexp.QuoteMeta(e.Name)))
+
+		if pattern.MatchString(result) {
+			result = pattern.ReplaceAllString(result, wrapped+"\n")
+		} else {
+			result = strings.TrimRight(result, "\n") + "\n\n" + wrapped + "\n"
 		}
 	}
 
-	err := os.WriteFile(".gitignore", []byte(content), 0644)
-	if err != nil {
-		return fmt.Errorf("failed to write .gitignore file: %w", err)
-	}
+	return os.WriteFile(path, []byte(result), 0644)
+}
 
-	fmt.Println("Successfully added/updated .gitignore file.")
-	return nil
+func wrapWithMarkers(name, content string) string {
+	start := fmt.Sprintf("# >>> ignore-cli: %s", name)
+	end := fmt.Sprintf("# <<< ignore-cli: %s", name)
+	return fmt.Sprintf("%s\n%s\n%s", start, strings.TrimSpace(content), end)
 }
