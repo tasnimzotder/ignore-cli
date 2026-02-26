@@ -92,6 +92,30 @@ func TestAddMultiple(t *testing.T) {
 	assert.Contains(t, got, "*.pyc")
 }
 
+func TestListAdded_FindsMarkers(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, ".gitignore")
+	content := "# >>> ignore-cli: Go\n*.exe\n# <<< ignore-cli: Go\n\n# >>> ignore-cli: Python\n*.pyc\n# <<< ignore-cli: Python\n"
+	os.WriteFile(path, []byte(content), 0644)
+
+	added := ListAdded(path)
+	assert.ElementsMatch(t, []string{"Go", "Python"}, added)
+}
+
+func TestListAdded_EmptyFile(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, ".gitignore")
+	os.WriteFile(path, []byte(""), 0644)
+
+	added := ListAdded(path)
+	assert.Empty(t, added)
+}
+
+func TestListAdded_NoFile(t *testing.T) {
+	added := ListAdded("/nonexistent/.gitignore")
+	assert.Empty(t, added)
+}
+
 func TestAddMultiple_Override(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, ".gitignore")

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	tea "github.com/charmbracelet/bubbletea"
+	tea "charm.land/bubbletea/v2"
 	"github.com/spf13/cobra"
 	"github.com/tasnimzotder/ignore-cli/internal/cache"
 	"github.com/tasnimzotder/ignore-cli/internal/gitignore"
@@ -22,7 +22,7 @@ var addCmd = &cobra.Command{
 		if len(args) > 0 {
 			return addDirect(gitignorePath, args)
 		}
-		return addInteractive(gitignorePath)
+		return launchTUI(gitignorePath)
 	},
 }
 
@@ -57,8 +57,9 @@ func addDirect(path string, templateNames []string) error {
 	return nil
 }
 
-func addInteractive(path string) error {
+func launchTUI(path string) error {
 	c := cache.GetInstance()
+
 	fetchFn := func() ([]string, error) {
 		templates, err := c.ListTemplates()
 		if err != nil {
@@ -71,14 +72,24 @@ func addInteractive(path string) error {
 		return names, nil
 	}
 
-	picker := tui.NewPicker(fetchFn)
-	p := tea.NewProgram(picker, tea.WithAltScreen())
+	contentFn := func(name string) (string, error) {
+		tmpl, err := c.FindTemplate(name)
+		if err != nil {
+			return "", err
+		}
+		return tmpl.Content()
+	}
+
+	added := gitignore.ListAdded(path)
+
+	model := tui.New(fetchFn, contentFn, added, overrideFlag)
+	p := tea.NewProgram(model)
 	finalModel, err := p.Run()
 	if err != nil {
 		return fmt.Errorf("TUI error: %w", err)
 	}
 
-	result := finalModel.(tui.PickerModel).Result()
+	result := finalModel.(tui.Model).Result()
 	if result.Canceled || len(result.Selected) == 0 {
 		fmt.Println("No templates selected.")
 		return nil

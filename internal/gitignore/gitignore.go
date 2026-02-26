@@ -52,6 +52,23 @@ func AddMultiple(path string, entries []Entry, override bool) error {
 	return os.WriteFile(path, []byte(result), 0644)
 }
 
+func ListAdded(path string) []string {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil
+	}
+
+	var names []string
+	for _, line := range strings.Split(string(data), "\n") {
+		trimmed := strings.TrimSpace(line)
+		if strings.HasPrefix(trimmed, "# >>> ignore-cli: ") {
+			name := strings.TrimPrefix(trimmed, "# >>> ignore-cli: ")
+			names = append(names, name)
+		}
+	}
+	return names
+}
+
 func wrapWithMarkers(name, content string) string {
 	start := fmt.Sprintf("# >>> ignore-cli: %s", name)
 	end := fmt.Sprintf("# <<< ignore-cli: %s", name)
