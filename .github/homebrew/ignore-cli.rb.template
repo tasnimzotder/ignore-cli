@@ -1,0 +1,38 @@
+class IgnoreCli < Formula
+  desc "A CLI tool for managing .gitignore files"
+  homepage "https://github.com/tasnimzotder/ignore-cli"
+  version "{{VERSION_NUM}}"
+  license "MIT"
+
+  on_macos do
+    on_intel do
+      url "https://github.com/tasnimzotder/ignore-cli/releases/download/{{VERSION}}/ignore-cli_{{VERSION_NUM}}_darwin_amd64.tar.gz"
+      sha256 "{{SHA_DARWIN_AMD64}}"
+    end
+
+    on_arm do
+      url "https://github.com/tasnimzotder/ignore-cli/releases/download/{{VERSION}}/ignore-cli_{{VERSION_NUM}}_darwin_arm64.tar.gz"
+      sha256 "{{SHA_DARWIN_ARM64}}"
+    end
+  end
+
+  on_linux do
+    on_intel do
+      url "https://github.com/tasnimzotder/ignore-cli/releases/download/{{VERSION}}/ignore-cli_{{VERSION_NUM}}_linux_amd64.tar.gz"
+      sha256 "{{SHA_LINUX_AMD64}}"
+    end
+
+    on_arm do
+      url "https://github.com/tasnimzotder/ignore-cli/releases/download/{{VERSION}}/ignore-cli_{{VERSION_NUM}}_linux_arm64.tar.gz"
+      sha256 "{{SHA_LINUX_ARM64}}"
+    end
+  end
+
+  def install
+    bin.install "ignore"
+  end
+
+  test do
+    system "#{bin}/ignore", "--help"
+  end
+end

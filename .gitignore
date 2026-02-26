@@ -33,6 +33,6 @@ go.work.sum
 # .vscode/
 # <<< ignore-cli: Go
 
-ignore-cli
 build/
+dist/
 .tmp/
